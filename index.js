@@ -33,11 +33,28 @@ const createCTE = async () => {
     `);
 }
 
+async function calculateSum() {
+    try {
+        const [result, metadata] = await sequelize.query(`
+            WITH RECURSIVE t(n) AS (
+                VALUES (1)
+              UNION ALL
+                SELECT n+1 FROM t WHERE n < 100
+            )
+            SELECT sum(n) FROM t;
+        `);
+        console.log('sum:', result[0].sum);
+    } catch (error) {
+        console.error('error executing query:', error);
+    }
+}
+
 const run = async () => {
     await connect();
     await createTable();
     await insert();
     await createCTE();
+    await calculateSum();
 }
 
 run();
